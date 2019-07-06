@@ -1,5 +1,5 @@
 # dohrnii
-Immutable social network database
+Keeps track of every single tweet an account makes. Nothing is forgotten.
 
 ## Requirements
 
