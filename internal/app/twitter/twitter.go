@@ -1,7 +1,6 @@
 package twitter
 
 import (
-	"os"
 	"log"
 	"flag"
 	"time"
@@ -21,7 +20,6 @@ type Tweet struct {
 func GetTweets() []Tweet {
 	flags := flag.NewFlagSet("app-auth", flag.ExitOnError)
 	accessToken := flags.String("app-access-token", "AAAAAAAAAAAAAAAAAAAAAKDv%2FAAAAAAADfoFqiqL7romy%2Bv3I0d0vBsdR0Y%3DNF6444DjREZu76Wi492UUJvfg8wT0F8UgCfOaBhhN2MV72u5GY", "Twitter Application Access Token")
-	flags.Parse(os.Args[1:])
 	flagutil.SetFlagsFromEnv(flags, "TWITTER")
 
 	if *accessToken == "" {
