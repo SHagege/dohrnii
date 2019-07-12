@@ -18,4 +18,4 @@ Run `go build` in `cmd/dohrnii/`.
 Run `./dohrnii -l [PORT]` with `[PORT]` being any port you want. 
 
 ## License
-Blackbox is available under the MIT license. See the [LICENSE](LICENSE) file for more info.
+Dohrnii is available under the MIT license. See the [LICENSE](LICENSE) file for more info.
