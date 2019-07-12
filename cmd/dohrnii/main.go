@@ -35,6 +35,7 @@ func main() {
 		// a user-defined protocol name.
 		ha.SetStreamHandler("/p2p/1.0.0", node.HandleStream)
 
+		go block.Initialize()
 		select {}
 	} else {
 		ha.SetStreamHandler("/p2p/1.0.0", node.HandleStream)
