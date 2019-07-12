@@ -4,7 +4,11 @@
 </h1>
 
 # dohrnii
-This project uses the libp2p Networking Stack to store social media informations on a permissionless distributed ledger.
+This project is a Go implementation of another project I made. This one uses the libp2p Networking Stack to store social media information on a permissionless distributed ledger.
+
+It can be used as a framework for storing any data into a distributed ledger. I chose tweets in this case but you can literally fork it and use any API to fetch data of any service provider you want. Only a single element in the block structure needs to be updated. The proof-of-work system and peer-to-peer implementation stays the same.
+
+*Turritopsis dohrnii is an immortal jellyfish.* 
 
 ## Requirements
 
