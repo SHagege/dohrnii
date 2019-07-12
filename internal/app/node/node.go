@@ -24,6 +24,8 @@ import (
 
 )
 
+var currentBc block.Blockchain
+
 // Host creates a new basic host
 func Host(listenPort int, secio bool, randseed int64) (host.Host, error) {
 	var r io.Reader
@@ -85,22 +87,22 @@ func ReadData(rw *bufio.ReadWriter) {
 			return
 		}
 		if str != "\n" {
+			bcReceived := []block.Block{}
+			s := string(str)
+			json.Unmarshal([]byte(s), &bcReceived)
 
-			chain := make([]block.Block, 0)
-			if err := json.Unmarshal([]byte(str), &chain); err != nil {
+			if err := json.Unmarshal([]byte(str), &bcReceived); err != nil {
 				log.Fatal(err)
 			}
 
 			block.Mutex.Lock()
-			if len(chain) > len(block.Bc.Chain) {
-				block.Bc.Chain = chain
-				bytes, err := json.MarshalIndent(block.Bc.Chain, "", "  ")
+			if bcReceived[len(bcReceived) - 1].Height > len(block.Bc.Chain) {
+				block.Bc.Chain = bcReceived
+				bytes, err := json.MarshalIndent(bcReceived, "", "  ")
 				if err != nil {
 
 					log.Fatal(err)
 				}
-				// Green console color: 	\x1b[32m
-				// Reset console color: 	\x1b[0m
 				fmt.Printf("\x1b[32m%s\x1b[0m> ", string(bytes))
 			}
 			block.Mutex.Unlock()
@@ -131,7 +133,6 @@ func WriteData(rw *bufio.ReadWriter) {
 	stdReader := bufio.NewReader(os.Stdin)
 
 	for {
-		fmt.Print("> ")
 		sendData, err := stdReader.ReadString('\n')
 		if err != nil {
 			log.Fatal(err)
@@ -141,7 +142,7 @@ func WriteData(rw *bufio.ReadWriter) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		newBlock := block.CreateBlock(block.GetLastBlock(block.Bc.Chain))
+		newBlock := block.CreateBlock(currentBc.GetLastBlock())
 
 		block.Mutex.Lock()
 		block.Bc.Chain = append(block.Bc.Chain, newBlock)
