@@ -1,6 +1,10 @@
 package main
 
 import (
+	"dohrnii/internal/app/handlers"
+	"path/filepath"
+	"path"
+	"github.com/gin-gonic/gin"
 	"context"
 	"bufio"
 	"fmt"
@@ -12,6 +16,27 @@ import (
 	peer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 )
+
+func server() {
+	r := gin.Default()
+	r.NoRoute(func(c *gin.Context) {
+		dir, file := path.Split(c.Request.RequestURI)
+		ext := filepath.Ext(file)
+		if file == "" || ext == "" {
+			c.File("./ui/dist/ui/index.html")
+		} else {
+			c.File("./ui/dist/ui" + path.Join(dir, file))
+		}
+	})
+
+	authorized := r.Group("/")
+	authorized.GET("/blockchain", handlers.GetBlockchain)
+	authorized.GET("/lastblock", handlers.GetLastBlock)
+	errServer := r.Run(":3000")
+	if errServer != nil {
+		panic(errServer)
+	}
+}
 
 func main() {
 	listenF := flag.Int("l", 0, "wait for incoming connections")
@@ -29,6 +54,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	go server()
 	if *target == "" {
 		log.Println("listening for connections")
 		// Set a stream handler on host A. /p2p/1.0.0 is

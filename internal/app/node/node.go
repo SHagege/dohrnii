@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-
 	"dohrnii/internal/app/block"
 	"github.com/davecgh/go-spew/spew"
 	libp2p "github.com/libp2p/go-libp2p"
@@ -24,7 +23,11 @@ import (
 
 )
 
-var currentBc block.Blockchain
+var  (
+	CurrentBc	block.Blockchain
+	audience	string
+	domain		string
+)
 
 // Host creates a new basic host
 func Host(listenPort int, secio bool, randseed int64) (host.Host, error) {
@@ -142,7 +145,7 @@ func WriteData(rw *bufio.ReadWriter) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		newBlock := block.CreateBlock(currentBc.GetLastBlock())
+		newBlock := block.CreateBlock(CurrentBc.GetLastBlock())
 
 		block.Mutex.Lock()
 		block.Bc.Chain = append(block.Bc.Chain, newBlock)
