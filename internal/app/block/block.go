@@ -1,6 +1,7 @@
 package block
 
 import (
+	"os"
 	"encoding/json"
 	"sync"
 	"crypto/sha256"
@@ -29,7 +30,7 @@ type Blockchain struct {
 	Nodes		[]string	`json:"nodes"`
 }
 
-var targetMax = "0x00000FFFFFFFFFFFFFFFFFFFFFF000000000000000000000000000000000000"
+var targetMax = "0x0000FFFFFFFFFFFFFFFFFFFFFFF000000000000000000000000000000000000"
 var tweetPool []twitter.Tweet
 
 // Mutex securely prevent race conditions
@@ -41,17 +42,18 @@ var Bc Blockchain
 // Initialize the values to get the blockchain starting
 func Initialize() {
 	go fetchTweets()
+	fp := checkIfFileExist()
 	currentTime, _ := time.Parse("2006-01-02T15:04:05", time.Now().Format("2006-01-02T15:04:05"))
 	genesis := Block{0, "", "", tweetPool, 0, currentTime.String(), 1}
 	Bc.Chain = append(Bc.Chain, genesis)
-	blockchainToJSON()
+	blockchainToJSON(fp)
 	newBlock := CreateBlock(genesis)
 	Bc.Chain = append(Bc.Chain, newBlock)
 	for {
 		newBlock := CreateBlock(Bc.GetLastBlock())
 		if newBlock.Height >= len(Bc.Chain) {
 			Bc.Chain = append(Bc.Chain, newBlock)
-			blockchainToJSON()
+			blockchainToJSON(fp)
 		}
 	}
 }
@@ -128,13 +130,15 @@ func (Bc *Blockchain) GetLastBlock() Block {
 	return Bc.Chain[index]
 }
 
-func blockchainToJSON() {
+func blockchainToJSON(fp *os.File) {
 	bytes, err := json.MarshalIndent(Bc.GetLastBlock(), "", "  ")
 	if err != nil {
 
 		log.Fatal(err)
 	}
 	fmt.Printf("\x1b[32m%s\x1b[0m> ", string(bytes))
+	fp.WriteString(string(bytes))
+
 }
 
 // GetBlockchain returns the current instance of the blockchain
@@ -146,4 +150,15 @@ func (Bc Blockchain) GetBlockchain() Blockchain {
 func (Bc *Blockchain) SetBlockchain(b []Block) {
 	Bc.Chain = Bc.Chain[:0]
 	Bc.Chain = b
+}
+
+func checkIfFileExist() (fp *os.File) {
+	fmt.Println("Checkif")
+	if _, err := os.Stat("../../assets/blk.dat"); os.IsNotExist(err) {
+		fmt.Println("Yes")
+		fp, _ := os.Create("../../assets/blk.dat")
+		return fp
+	}
+	file, _ := os.Open("../../assets/blk.dat")
+	return file
 }
